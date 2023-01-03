@@ -15,7 +15,7 @@ public class HoppieAutoStationRunner {
         System.out.println("Running Hoppie Auto Station...");
         int port = Integer.parseInt(StringUtils.defaultIfBlank(System.getenv("PORT"), "8080"));
         System.out.println("Starting health check responder on port " + port + "...");
-        HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
+        HttpServer httpServer = HttpServer.create(new InetSocketAddress("0.0.0.0", port), 0);
         httpServer.createContext("/", exchange -> {
             String response = "OK";
             exchange.sendResponseHeaders(200, response.length());
