@@ -1,6 +1,7 @@
 package com.kubrynski.hoppie_autorespond;
 
 import com.sun.net.httpserver.HttpServer;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -12,13 +13,16 @@ public class HoppieAutoStationRunner {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Running Hoppie Auto Station...");
-        HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
+        int port = Integer.parseInt(StringUtils.defaultIfBlank(System.getenv("PORT"), "8080"));
+        System.out.println("Starting health check responder on port " + port + "...");
+        HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", port), 0);
         httpServer.createContext("/", exchange -> {
             String response = "OK";
             exchange.sendResponseHeaders(200, response.length());
             OutputStream responseBody = exchange.getResponseBody();
             responseBody.write(response.getBytes());
             responseBody.close();
+            System.out.println("Responded to health check...");
         });
         httpServer.start();
 
