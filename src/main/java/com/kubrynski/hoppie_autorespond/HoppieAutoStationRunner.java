@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 public class HoppieAutoStationRunner {
 
     public static void main(String[] args) throws IOException {
+        System.out.println("Running Hoppie Auto Station...");
         HttpServer httpServer = HttpServer.create(new InetSocketAddress("localhost", 8080), 0);
         httpServer.start();
 
