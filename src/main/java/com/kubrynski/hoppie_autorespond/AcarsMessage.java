@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class AcarsMessage {
+    public static final Pattern MESSAGE_PATTERN = Pattern.compile("(\\S*)\\s(\\S*)\\s\\{(\\/\\S*\\/|TELEX\\s)([^\\}]*)\\}");
     private static final Pattern MESSAGE_CODE_PATTERN = Pattern.compile("\\/data2\\/(\\d*)\\/(.*?)\\/(\\w{1,2})");
     private final String stationId;
     private final String messageType;
@@ -30,6 +31,17 @@ class AcarsMessage {
         this.data = StringUtils.substringBefore(data, " DUE TO");
     }
 
+    static AcarsMessage from(String rawMessage) {
+        Matcher matcher = MESSAGE_PATTERN.matcher(rawMessage);
+
+        if (matcher.find()) {
+            MatchResult result = matcher.toMatchResult();
+            return new AcarsMessage(result.group(1), result.group(2), result.group(3), result.group(4));
+        } else {
+            throw new IllegalArgumentException("Cannot parse message: " + rawMessage);
+        }
+    }
+
     public String getStationId() {
         return stationId;
     }
@@ -40,6 +52,10 @@ class AcarsMessage {
 
     public String getReplyId() {
         return replyId;
+    }
+
+    public String getResponseType() {
+        return responseType;
     }
 
     public String getData() {

@@ -7,13 +7,13 @@ import java.util.stream.Collectors;
 
 class AcarsMessageParser {
 
-    private static final Pattern MESSAGE_REGEX = Pattern.compile("\\{(\\S*)\\s(\\S*)\\s\\{(\\/\\S*\\/|TELEX\\s)([^\\}]*)\\}\\}");
+    private static final Pattern MESSAGE_REGEX = Pattern.compile("\\{(.*?\\})\\}");
 
     List<AcarsMessage> parseMessages(String message) {
         Matcher matcher = MESSAGE_REGEX.matcher(message);
 
         return matcher.results()
-                .map(result -> new AcarsMessage(result.group(1), result.group(2), result.group(3), result.group(4)))
+                .map(result -> AcarsMessage.from(result.group(1)))
                 .collect(Collectors.toList());
     }
 }
