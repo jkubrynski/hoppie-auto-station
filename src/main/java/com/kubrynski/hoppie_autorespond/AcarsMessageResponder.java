@@ -6,35 +6,24 @@ class AcarsMessageResponder {
 
     ReplyObject prepareReplyObject(AcarsMessage acarsMessage) {
         if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST LOGON")) {
-            System.out.println(acarsMessage.getStationId() + " => Confirming logon");
             return new ReplyObject("NE", "LOGON ACCEPTED");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST DIRECT TO")) {
-            System.out.println(acarsMessage.getStationId() + " => Confirming DIRECT TO");
             String parameter = acarsMessage.getData().replace("REQUEST DIRECT TO ", "");
             return new ReplyObject("WU", "PROCEED DIRECT TO @" + parameter + "@");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST GROUND TRACK")) {
-            System.out.println(acarsMessage.getStationId() + " => Confirming GROUND TRACK");
             String parameter = acarsMessage.getData().replace("REQUEST GROUND TRACK ", "");
             return new ReplyObject("WU", "TURN @RIGHT@ GROUND TRACK @" + parameter + "@");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST HEADING")) {
-            System.out.println(acarsMessage.getStationId() + " => Confirming HEADING");
             String parameter = acarsMessage.getData().replace("REQUEST HEADING ", "");
             return new ReplyObject("WU", "TURN @RIGHT@ HEADING @" + parameter + "@");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST OWN SEPARATION AND VMC")) {
-            System.out.println(acarsMessage.getStationId() + " => Confirming OWN SEPARATION");
             return new ReplyObject("WU", "MAINTAIN OWN SEPARATION AND VMC");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST CLB TO")) {
-            System.out.println(acarsMessage.getStationId() + " => Confirming REQUEST CLB TO");
             String parameter = acarsMessage.getData().replace("REQUEST CLB TO ", "");
             return new ReplyObject("WU", processAltRequestParameter(parameter, "CLIMB TO AND MAINTAIN"));
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST DES TO")) {
-            System.out.println(acarsMessage.getStationId() + " => Confirming REQUEST DES TO");
             String parameter = acarsMessage.getData().replace("REQUEST DES TO ", "");
             return new ReplyObject("WU", processAltRequestParameter(parameter, "DESCENT TO AND MAINTAIN"));
-        } else if ("LOGOFF".equals(acarsMessage.getData())) {
-            System.out.println(acarsMessage.getStationId() + " => Logoff");
-        } else {
-            System.out.println("Received not serviceable message: " + acarsMessage);
         }
         return null;
     }

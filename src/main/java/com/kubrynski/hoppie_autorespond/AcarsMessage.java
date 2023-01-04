@@ -7,27 +7,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class AcarsMessage {
-    public static final Pattern MESSAGE_PATTERN = Pattern.compile("(\\S*)\\s(\\S*)\\s\\{(\\/\\S*\\/|TELEX\\s)([^\\}]*)\\}");
-    private static final Pattern MESSAGE_CODE_PATTERN = Pattern.compile("\\/data2\\/(\\d*)\\/(.*?)\\/(\\w{1,2})");
+
+    private static final Pattern MESSAGE_PATTERN = Pattern.compile("(\\S*)\\s(\\S*)\\s\\{/data2/(\\d*)/(.*?)/(\\w{1,2})/([^}]*)}");
+
     private final String stationId;
-    private final String messageType;
-    private final String data;
     private final String msgId;
     private final String replyId;
     private final String responseType;
+    private final String data;
 
-    AcarsMessage(String stationId, String messageType, String messageCode, String data) {
+    AcarsMessage(String stationId, String msgId, String replyId, String responseType, String data) {
         this.stationId = stationId;
-        this.messageType = messageType;
-        Matcher matcher = MESSAGE_CODE_PATTERN.matcher(messageCode);
-        if (matcher.find()) {
-            MatchResult matchResult = matcher.toMatchResult();
-            this.msgId = matchResult.group(1);
-            this.replyId = matchResult.group(2);
-            this.responseType = matchResult.group(3);
-        } else {
-            throw new IllegalArgumentException("Not able to parse messageCode: " + messageCode);
-        }
+        this.msgId = msgId;
+        this.replyId = replyId;
+        this.responseType = responseType;
         this.data = StringUtils.substringBefore(data, " DUE TO");
     }
 
@@ -36,29 +29,29 @@ class AcarsMessage {
 
         if (matcher.find()) {
             MatchResult result = matcher.toMatchResult();
-            return new AcarsMessage(result.group(1), result.group(2), result.group(3), result.group(4));
+            return new AcarsMessage(result.group(1), result.group(3), result.group(4), result.group(5), result.group(6));
         } else {
             throw new IllegalArgumentException("Cannot parse message: " + rawMessage);
         }
     }
 
-    public String getStationId() {
+    String getStationId() {
         return stationId;
     }
 
-    public String getMsgId() {
+    String getMsgId() {
         return msgId;
     }
 
-    public String getReplyId() {
+    String getReplyId() {
         return replyId;
     }
 
-    public String getResponseType() {
+    String getResponseType() {
         return responseType;
     }
 
-    public String getData() {
+    String getData() {
         return data;
     }
 
@@ -66,11 +59,10 @@ class AcarsMessage {
     public String toString() {
         final StringBuffer sb = new StringBuffer("AcarsMessage{");
         sb.append("stationId='").append(stationId).append('\'');
-        sb.append(", messageType='").append(messageType).append('\'');
-        sb.append(", data='").append(data).append('\'');
         sb.append(", msgId='").append(msgId).append('\'');
         sb.append(", replyId='").append(replyId).append('\'');
         sb.append(", responseType='").append(responseType).append('\'');
+        sb.append(", data='").append(data).append('\'');
         sb.append('}');
         return sb.toString();
     }
