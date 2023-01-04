@@ -38,7 +38,7 @@ class AcarsMessageResponderTest {
     void processRequestClb() {
         AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/9//Y/REQUEST CLB TO FL180}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
-        assertEquals("CLIMB TO AND MAINTAIN @FL180@",replyObject.message);
+        assertEquals("CLIMB TO AND MAINTAIN @FL180@ REPORT LEVEL @FL180@",replyObject.message);
         assertEquals("WU",replyObject.replyType);
     }
 
@@ -62,7 +62,7 @@ class AcarsMessageResponderTest {
     void processRequestDes() {
         AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/9//Y/REQUEST DES TO FL180}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
-        assertEquals("DESCENT TO AND MAINTAIN @FL180@",replyObject.message);
+        assertEquals("DESCENT TO AND MAINTAIN @FL180@ REPORT LEVEL @FL180@",replyObject.message);
         assertEquals("WU",replyObject.replyType);
     }
 
@@ -111,6 +111,22 @@ class AcarsMessageResponderTest {
         AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/4//Y/REQUEST OWN SEPARATION AND VMC}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
         assertEquals("MAINTAIN OWN SEPARATION AND VMC",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processRequestClearance() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/4//Y/REQUEST EPWA-EPGD EPWA.EVINA.GRUDA.IRLUN.EPGD}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("CLEARED TO @EPGD@ VIA @EVINA GRUDA IRLUN@ SQUAWK @2654@",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processRequestClearanceNoVia() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/4//Y/REQUEST EPWA-EPGD}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("CLEARED TO @EPGD@ SQUAWK @2654@",replyObject.message);
         assertEquals("WU",replyObject.replyType);
     }
 }

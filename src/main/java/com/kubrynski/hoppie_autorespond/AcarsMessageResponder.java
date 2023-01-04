@@ -2,7 +2,13 @@ package com.kubrynski.hoppie_autorespond;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 class AcarsMessageResponder {
+
+    private static final Pattern CLEARANCE_REQUEST_PATTERN = Pattern.compile("REQUEST ([A-Z]{4})-([A-Z]{4}).?(.*)");
 
     ReplyObject prepareReplyObject(AcarsMessage acarsMessage) {
         if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST LOGON")) {
@@ -24,6 +30,22 @@ class AcarsMessageResponder {
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST DES TO")) {
             String parameter = acarsMessage.getData().replace("REQUEST DES TO ", "");
             return new ReplyObject("WU", processAltRequestParameter(parameter, "DESCENT TO AND MAINTAIN"));
+        } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST")) {
+            Matcher clearanceRequest = CLEARANCE_REQUEST_PATTERN.matcher(acarsMessage.getData());
+            if (clearanceRequest.find()) {
+                MatchResult matchResult = clearanceRequest.toMatchResult();
+                String from = matchResult.group(1);
+                String to = matchResult.group(2);
+                String via = matchResult.group(3);
+
+                String message = "CLEARED TO @" + to + "@";
+                if (StringUtils.isNoneBlank(via)) {
+                    String withoutFromTo = StringUtils.remove(StringUtils.remove(via, from + "."), "." + to);
+                    message += " VIA @" + StringUtils.replaceChars(withoutFromTo, '.', ' ') + "@";
+                }
+                message += " SQUAWK @2654@";
+                return new ReplyObject("WU", message);
+            }
         }
         return null;
     }
@@ -43,13 +65,8 @@ class AcarsMessageResponder {
     // answers
     //PROCEED BACK ON ROUTE
 
-    //CLEARED [route][procedure] - maybe for all REQUEST?
-
     //REJOIN ROUTE BY [time]
     //EXPECT BACK ON ROUTE BY [time]
-
-    //CLIMB TO AND MAINTAIN FL390
-    //REPORT LEVEL FL390
 
     //two stations AND EXPECT CPDLC TRANSFER AT [time]
 
@@ -59,7 +76,7 @@ class AcarsMessageResponder {
             String[] split = parameter.split(" AT ");
             return "AT @" + split[1] + "@ " + command + " @" + split[0] + "@";
         } else {
-            return command + " @" + parameter + "@";
+            return command + " @" + parameter + "@ REPORT LEVEL @" + parameter + "@";
         }
     }
 
