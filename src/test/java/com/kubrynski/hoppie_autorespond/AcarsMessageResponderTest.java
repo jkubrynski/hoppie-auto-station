@@ -129,4 +129,12 @@ class AcarsMessageResponderTest {
         assertEquals("CLEARED TO @EPGD@ SQUAWK @2654@",replyObject.message);
         assertEquals("WU",replyObject.replyType);
     }
+
+    @Test
+    void processRequestSid() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/2//Y/REQUEST EVINA4K DEPARTURE}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("CLEARED @EVINA4K@ DEPARTURE",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
 }

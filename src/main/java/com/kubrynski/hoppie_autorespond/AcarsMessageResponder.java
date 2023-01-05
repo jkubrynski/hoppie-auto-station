@@ -31,6 +31,12 @@ class AcarsMessageResponder {
             String parameter = acarsMessage.getData().replace("REQUEST DES TO ", "");
             return new ReplyObject("WU", processAltRequestParameter(parameter, "DESCENT TO AND MAINTAIN"));
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST")) {
+            if (StringUtils.endsWithIgnoreCase(acarsMessage.getData(), " DEPARTURE")) {
+                String message = "CLEARED @" +
+                        StringUtils.remove(StringUtils.remove(acarsMessage.getData(), "REQUEST "), " DEPARTURE")
+                        + "@ DEPARTURE";
+                return new ReplyObject("WU", message);
+            }
             Matcher clearanceRequest = CLEARANCE_REQUEST_PATTERN.matcher(acarsMessage.getData());
             if (clearanceRequest.find()) {
                 MatchResult matchResult = clearanceRequest.toMatchResult();
