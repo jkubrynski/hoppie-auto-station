@@ -38,9 +38,9 @@ class AcarsMessageResponder {
             String parameter = acarsMessage.getData().replace("REQUEST DES TO ", "");
             return new ReplyObject("WU", processAltRequestParameter(parameter, "DESCENT TO AND MAINTAIN"));
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "WHEN CAN WE EXPECT HIGHER")) {
-            return new ReplyObject("WU", "EXPECT CLIMB AT @" + dateTimeProvider.currentTimePlusMinutes(5) + "@");
+            return new ReplyObject("WU", "EXPECT CLIMB AT @" + dateTimeProvider.currentTimePlusMinutes(5) + " UTC@");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "WHEN CAN WE EXPECT LOWER")) {
-            return new ReplyObject("WU", "EXPECT DESCENT AT @" + dateTimeProvider.currentTimePlusMinutes(5) + "@");
+            return new ReplyObject("WU", "EXPECT DESCENT AT @" + dateTimeProvider.currentTimePlusMinutes(5) + " UTC@");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST")) {
             if (StringUtils.endsWithIgnoreCase(acarsMessage.getData(), " DEPARTURE")) {
                 String message = "CLEARED @" +

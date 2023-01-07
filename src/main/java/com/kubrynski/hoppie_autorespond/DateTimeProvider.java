@@ -1,6 +1,7 @@
 package com.kubrynski.hoppie_autorespond;
 
-import java.time.LocalTime;
+import java.time.Clock;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 
@@ -13,20 +14,13 @@ class DateTimeProvider {
             .appendValue(MINUTE_OF_HOUR, 2)
             .toFormatter();
 
-    private LocalTime mockTime;
-
-    DateTimeProvider() {
-    }
+    private Clock clock = Clock.systemUTC();
 
     String currentTimePlusMinutes(int minutesToAdd) {
-        LocalTime now = LocalTime.now();
-        if (mockTime != null) {
-            now = mockTime;
-        }
-        return now.plusMinutes(minutesToAdd).format(timeFormatter);
+        return ZonedDateTime.now(clock).plusMinutes(minutesToAdd).format(timeFormatter);
     }
 
-    void setMockTime(LocalTime mockTime) {
-        this.mockTime = mockTime;
+    void setClock(Clock clock) {
+        this.clock = clock;
     }
 }
