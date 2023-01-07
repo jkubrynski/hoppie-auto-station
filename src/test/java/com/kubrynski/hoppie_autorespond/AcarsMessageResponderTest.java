@@ -2,13 +2,14 @@ package com.kubrynski.hoppie_autorespond;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
+import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class AcarsMessageResponderTest {
 
-    AcarsMessageResponder acarsMessageResponder = new AcarsMessageResponder();
+    DateTimeProvider dateTimeProvider = new DateTimeProvider();
+    AcarsMessageResponder acarsMessageResponder = new AcarsMessageResponder(dateTimeProvider);
 
     @Test
     void processLogon() {
@@ -135,6 +136,42 @@ class AcarsMessageResponderTest {
         AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/2//Y/REQUEST EVINA4K DEPARTURE}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
         assertEquals("CLEARED @EVINA4K@ DEPARTURE",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processRequestFL() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/4//Y/REQUEST FL350}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("CLIMB TO AND MAINTAIN @FL350@", replyObject.message);
+        assertEquals("WU", replyObject.replyType);
+    }
+
+    @Test
+    void processRequestFLDue() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/4//Y/REQUEST FL350 DUE TO AC PERFORMANCE}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("CLIMB TO AND MAINTAIN @FL350@",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processWhenHigher() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/3//Y/WHEN CAN WE EXPECT HIGHER ALT}");
+        dateTimeProvider.setMockTime(LocalTime.of(10, 2));
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        dateTimeProvider.setMockTime(null);
+        assertEquals("EXPECT CLIMB AT @1007@",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processWhenLower() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/28//Y/WHEN CAN WE EXPECT LOWER ALT AT PILOT DISCRETION}");
+        dateTimeProvider.setMockTime(LocalTime.of(10, 58));
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        dateTimeProvider.setMockTime(null);
+        assertEquals("EXPECT DESCENT AT @1103@",replyObject.message);
         assertEquals("WU",replyObject.replyType);
     }
 }

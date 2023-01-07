@@ -21,7 +21,7 @@ class AcarsMessage {
         this.msgId = msgId;
         this.replyId = replyId;
         this.responseType = responseType;
-        this.data = StringUtils.substringBefore(data, " DUE TO");
+        this.data = StringUtils.substringBefore(StringUtils.substringBefore(data, " DUE TO"), " AT PILOT DISCRETION");
     }
 
     static AcarsMessage from(String rawMessage) {

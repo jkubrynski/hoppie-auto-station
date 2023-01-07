@@ -14,7 +14,7 @@ class AcarsMessageProcessor {
     private final AtomicInteger counter = new AtomicInteger();
     private final OkHttpClient httpClient = new OkHttpClient();
 
-    private final AcarsMessageResponder acarsMessageResponder = new AcarsMessageResponder();
+    private final AcarsMessageResponder acarsMessageResponder = new AcarsMessageResponder(new DateTimeProvider());
 
     private final String urlTemplate;
 
