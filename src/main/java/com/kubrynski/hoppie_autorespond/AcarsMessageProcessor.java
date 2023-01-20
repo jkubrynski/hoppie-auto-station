@@ -66,6 +66,7 @@ class AcarsMessageProcessor {
             response.close();
             return new AcarsMessageParser().parseMessages(message);
         } catch (IOException e) {
+            System.out.println("Error when retrieving messages: " + e);
             throw new RuntimeException(e);
         }
     }
