@@ -7,12 +7,13 @@ import okhttp3.Response;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 class AcarsMessageProcessor {
 
     private final AtomicInteger counter = new AtomicInteger();
-    private final OkHttpClient httpClient = new OkHttpClient();
+    private final OkHttpClient httpClient;
 
     private final AcarsMessageResponder acarsMessageResponder = new AcarsMessageResponder(new DateTimeProvider());
 
@@ -20,6 +21,12 @@ class AcarsMessageProcessor {
 
     AcarsMessageProcessor(String station, String secret) {
         urlTemplate = "https://www.hoppie.nl/acars/system/connect.html?from=" + station + "&logon=" + secret;
+        httpClient = new OkHttpClient.Builder()
+                .connectTimeout(5, TimeUnit.SECONDS)
+                .writeTimeout(5, TimeUnit.SECONDS)
+                .readTimeout(10, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true)
+                .build();
     }
 
     void processMessages() {
