@@ -41,8 +41,13 @@ public class HoppieAutoStationRunner {
                 System.getenv("HOPPIE_SECRET")
         );
 
+        TIME.set(System.currentTimeMillis());
+
         Executors.newScheduledThreadPool(1).scheduleAtFixedRate(
                 () -> {
+                    if (System.currentTimeMillis() - TIME.get() > TimeUnit.SECONDS.toMillis(45)) {
+                        System.exit(1);
+                    }
                     acarsMessageProcessor.processMessages();
                     TIME.set(System.currentTimeMillis());
                 },
