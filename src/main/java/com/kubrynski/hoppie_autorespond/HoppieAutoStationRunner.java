@@ -41,9 +41,13 @@ public class HoppieAutoStationRunner {
                 System.getenv("HOPPIE_SECRET")
         );
 
-        acarsMessageProcessor.processMessages();
-
-        httpServer.stop(2);
+        Executors.newScheduledThreadPool(1).scheduleAtFixedRate(
+                () -> {
+                    acarsMessageProcessor.processMessages();
+                    TIME.set(System.currentTimeMillis());
+                },
+                0, 20, TimeUnit.SECONDS
+        );
     }
 
 }
