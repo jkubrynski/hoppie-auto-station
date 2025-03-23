@@ -125,7 +125,7 @@ class AcarsMessageResponderTest {
 
     @Test
     void processRequestTAS() {
-        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/5//Y/REQUEST 250}");
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/5//Y/REQUEST 250 KT}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
         assertEquals("MAINTAIN @250@",replyObject.message);
         assertEquals("WU",replyObject.replyType);
@@ -133,7 +133,7 @@ class AcarsMessageResponderTest {
 
     @Test
     void processRequestMach() {
-        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/5//Y/REQUEST M.82}");
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/5//Y/REQUEST  M.82}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
         assertEquals("MAINTAIN @M.82@",replyObject.message);
         assertEquals("WU",replyObject.replyType);
