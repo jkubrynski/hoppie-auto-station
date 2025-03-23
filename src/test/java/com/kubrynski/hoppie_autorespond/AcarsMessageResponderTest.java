@@ -44,6 +44,14 @@ class AcarsMessageResponderTest {
     }
 
     @Test
+    void processRequestClimb() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/9//Y/REQUEST CLIMB TO FL180}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("CLIMB TO AND MAINTAIN @FL180@ REPORT LEVEL @FL180@",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
     void processRequestClbAt() {
         AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/15//Y/REQUEST CLB TO FL250 AT SUBIX}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
@@ -108,6 +116,30 @@ class AcarsMessageResponderTest {
     }
 
     @Test
+    void processRequestOffset() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/5//Y/REQUEST OFFSET 2 R OF ROUTE DUE TO WEATHER}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("OFFSET @2 R@ OF ROUTE",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processRequestTAS() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/5//Y/REQUEST 250}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("MAINTAIN @250@",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processRequestMach() {
+        AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/5//Y/REQUEST M.82}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("MAINTAIN @M.82@",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
     void processRequestOwnSeparation() {
         AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/4//Y/REQUEST OWN SEPARATION AND VMC}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
@@ -128,6 +160,17 @@ class AcarsMessageResponderTest {
         AcarsMessage acarsMessage = AcarsMessage.from("LOT123 cpdlc {/data2/4//Y/REQUEST EPWA-EPGD}");
         AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
         assertEquals("CLEARED TO @EPGD@ SQUAWK @2654@",replyObject.message);
+        assertEquals("WU",replyObject.replyType);
+    }
+
+    @Test
+    void processRequestPreDepClearance() {
+        AcarsMessage acarsMessage = AcarsMessage.from("JDI65C cpdlc {/data2/4//Y/REQUEST PREDEP CLEARANCE\n" +
+                "JDI65C CL65 TO EPGD\n" +
+                "AT EPMO\n" +
+                "ATIS C}");
+        AcarsMessageResponder.ReplyObject replyObject = acarsMessageResponder.prepareReplyObject(acarsMessage);
+        assertEquals("CLEARED TO @EPGD@ SQUAWK @2654@ REPORT READY FOR STARTUP",replyObject.message);
         assertEquals("WU",replyObject.replyType);
     }
 

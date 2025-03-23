@@ -9,7 +9,9 @@ import java.util.regex.Pattern;
 class AcarsMessageResponder {
 
     private static final Pattern CLEARANCE_REQUEST_PATTERN = Pattern.compile("REQUEST ([A-Z]{4})-([A-Z]{4}).?(.*)");
+    private static final Pattern PREDEP_CLEARANCE_REQUEST_PATTERN = Pattern.compile("REQUEST PREDEP (.*) TO ([A-Z]{4}) (.*)");
     private static final Pattern FL_REQUEST_PATTERN = Pattern.compile("REQUEST FL([0-9]{3})(.*)");
+    private static final Pattern SPEED_REQUEST_PATTERN = Pattern.compile("REQUEST ([0-9]{3}|M\\.[0-9]{1,2})(.*)");
 
     private final DateTimeProvider dateTimeProvider;
 
@@ -31,8 +33,15 @@ class AcarsMessageResponder {
             return new ReplyObject("WU", "TURN @RIGHT@ HEADING @" + parameter + "@");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST OWN SEPARATION AND VMC")) {
             return new ReplyObject("WU", "MAINTAIN OWN SEPARATION AND VMC");
+        } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST OFFSET")) {
+            String parameter = acarsMessage.getData().replace("REQUEST OFFSET ", "");
+            parameter = StringUtils.substringBefore(parameter, " OF");
+            return new ReplyObject("WU", "OFFSET @" + parameter + "@ OF ROUTE");
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST CLB TO")) {
             String parameter = acarsMessage.getData().replace("REQUEST CLB TO ", "");
+            return new ReplyObject("WU", processAltRequestParameter(parameter, "CLIMB TO AND MAINTAIN"));
+        } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST CLIMB TO")) {
+            String parameter = acarsMessage.getData().replace("REQUEST CLIMB TO ", "");
             return new ReplyObject("WU", processAltRequestParameter(parameter, "CLIMB TO AND MAINTAIN"));
         } else if (StringUtils.startsWithIgnoreCase(acarsMessage.getData(), "REQUEST DES TO")) {
             String parameter = acarsMessage.getData().replace("REQUEST DES TO ", "");
@@ -70,6 +79,20 @@ class AcarsMessageResponder {
                 }
                 message += " SQUAWK @2654@";
                 return new ReplyObject("WU", message);
+            }
+
+            Matcher speedRequest = SPEED_REQUEST_PATTERN.matcher(acarsMessage.getData());
+            if (speedRequest.find()) {
+                MatchResult matchResult = speedRequest.toMatchResult();
+                String speed = matchResult.group(1);
+                return new ReplyObject("WU", "MAINTAIN @" + speed + "@");
+            }
+
+            Matcher predepRequest = PREDEP_CLEARANCE_REQUEST_PATTERN.matcher(StringUtils.replaceChars(acarsMessage.getData(), "\n", " "));
+            if (predepRequest.find()) {
+                MatchResult matchResult = predepRequest.toMatchResult();
+                String destination = matchResult.group(2);
+                return new ReplyObject("WU", "CLEARED TO @" + destination + "@ SQUAWK @2654@ REPORT READY FOR STARTUP");
             }
         }
         return null;
